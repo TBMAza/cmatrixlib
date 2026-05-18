@@ -1,9 +1,14 @@
+CC := gcc
+CFLAGS := -std=c99 -Wall -Wextra -Wpedantic -Werror -g
+SANFLAGS := -fsanitize=address,undefined
+LDFLAGS := -lpthread
+
 main: main.o cmatrixlib.o
-	@gcc -o main main.o cmatrixlib.o -lpthread -std=c99 -Wall -Wextra -Wpedantic -Werror -fsanitize=address,undefined -g
+	@$(CC) -o main main.o cmatrixlib.o $(LDFLAGS) $(SANFLAGS)
 main.o: main.c
-	@gcc -o main.o -c main.c
+	@$(CC) $(CCFLAGS) $(SANFLAGS) -o main.o -c main.c
 cmatrixlib.o: cmatrixlib.c
-	@gcc -o cmatrixlib.o -c cmatrixlib.c
+	@$(CC) $(CCFLAGS) $(SANFLAGS) -o cmatrixlib.o -c cmatrixlib.c
 cleano:
 	@rm *.o
 cleane:
