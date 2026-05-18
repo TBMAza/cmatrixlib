@@ -2,8 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
+#include <time.h>
+#include <string.h>
 
-Matrix* matinit(size_t rows, size_t cols, float* cell, float initval) {
+Matrix* matinit(size_t rows, size_t cols, mtype* cell, mtype initval) {
 	Matrix* ret = malloc(sizeof(Matrix));
 	ret->rows = rows;
 	ret->cols = cols;
@@ -13,9 +15,22 @@ Matrix* matinit(size_t rows, size_t cols, float* cell, float initval) {
 	}
 	else {
 		ret->owns_cell = true;
-		ret->cell = malloc(sizeof(float) * rows * cols);
+		ret->cell = malloc(sizeof(mtype) * rows * cols);
 		for(size_t i = 0; i < rows*cols; ++i) ret->cell[i] = initval;
 	}
+	return ret;
+}
+Matrix* matrand(size_t rows, size_t cols, mtype l, mtype u) {
+	srand(time(NULL));
+
+	Matrix* ret = malloc(sizeof(Matrix));
+	ret->rows = rows;
+	ret->cols = cols;
+	ret->owns_cell = true;
+	ret->cell = malloc(sizeof(mtype) * rows * cols);
+	
+	for(size_t i = 0; i < rows*cols; ++i) ret->cell[i] = l + ((mtype)rand() / (mtype)RAND_MAX) * (u - l);
+	
 	return ret;
 }
 void matprint(Matrix* m) {
@@ -38,7 +53,7 @@ Matrix* mattranspose(Matrix* m) {
 	ret->rows = m->cols;
 	ret->cols = m->rows;
 	ret->owns_cell = true;
-	ret->cell = malloc(sizeof(float) * ret->rows * ret->cols);
+	ret->cell = malloc(sizeof(mtype) * ret->rows * ret->cols);
 	for(size_t i = 0; i < m->rows; ++i) {
 		for(size_t j = 0; j < m->cols; ++j) {
 			ret->cell[j*ret->cols + i] = m->cell[i*m->cols + j];
@@ -53,18 +68,18 @@ Matrix* matsum(Matrix* m1, Matrix* m2) {
 	ret->rows = m1->rows;
 	ret->cols = m1->cols;
 	ret->owns_cell = true;
-	ret->cell = malloc(sizeof(float) * ret->rows * ret->cols);
+	ret->cell = malloc(sizeof(mtype) * ret->rows * ret->cols);
 	
 	for(size_t i = 0; i < ret->rows * ret->cols; ++i) ret->cell[i] = m1->cell[i] + m2->cell[i];
 	
 	return ret; 
 }
-Matrix* matscalarmult(float x, Matrix* m) {
+Matrix* matscalarmult(mtype x, Matrix* m) {
 	Matrix* ret = malloc(sizeof(Matrix));
 	ret->rows = m->rows;
 	ret->cols = m->cols;
 	ret->owns_cell = true;
-	ret->cell = malloc(sizeof(float) * ret->rows * ret->cols);
+	ret->cell = malloc(sizeof(mtype) * ret->rows * ret->cols);
 	
 	for(size_t i = 0; i < ret->rows * ret->cols; ++i) ret->cell[i] = m->cell[i] * x;
 	
@@ -77,7 +92,7 @@ Matrix* matmult(Matrix* m1, Matrix* m2) {
 	ret->rows = m1->rows;
 	ret->cols = m2->cols;
 	ret->owns_cell = true;
-	ret->cell = calloc(ret->rows * ret->cols, sizeof(float));
+	ret->cell = calloc(ret->rows * ret->cols, sizeof(mtype));
 
 	size_t m1_row_tracker = 0, m2_col_tracker = 0;
 	for(size_t i = 0; i < ret->rows * ret->cols; ++i) {
@@ -89,6 +104,23 @@ Matrix* matmult(Matrix* m1, Matrix* m2) {
 	}
 
 	return ret;
+}
+Matrix* matf(Matrix* m, mtype (*f)(mtype)) {
+	size_t len = m->rows * m->cols;
+	
+	Matrix* ret = malloc(sizeof(Matrix));
+	ret->rows = m->rows;
+	ret->cols = m->cols;
+	ret->owns_cell = true;
+	ret->cell = malloc(sizeof(mtype) * len);
+	
+	memcpy(ret->cell, m->cell, sizeof(mtype)*len);
+	for(size_t i = 0; i < len; ++i) ret->cell[i] = f(ret->cell[i]);
+
+	return ret;
+}
+void matf_inp(Matrix* m, mtype (*f)(mtype)) {
+	for(size_t i = 0; i < m->rows*m->cols; ++i) m->cell[i] = f(m->cell[i]);
 }
 
 /************************************************* MULTITHREADED API *************************************************/
@@ -122,7 +154,7 @@ Matrix* matsum_m(Matrix* m1, Matrix* m2) {
 	ret->rows = m1->rows;
 	ret->cols = m1->cols;
 	ret->owns_cell = true;
-	ret->cell = malloc(sizeof(float) * ret->rows * ret->cols);
+	ret->cell = malloc(sizeof(mtype) * ret->rows * ret->cols);
 
 	size_t elements = ret->rows * ret->cols;
 	size_t threads_no = elements / MINELEMSXTHREAD;
@@ -153,7 +185,7 @@ Matrix* matsum_m(Matrix* m1, Matrix* m2) {
 }
 
 typedef struct {
-	float x;
+	mtype x;
 	Matrix* m;
 	Matrix* ret;
 
@@ -162,7 +194,7 @@ typedef struct {
 } SMWArgs;
 static void* matscalarmult_worker(void* args) {
 	SMWArgs* uargs = (SMWArgs*)args;
-	float x = uargs->x;
+	mtype x = uargs->x;
 	Matrix* m = uargs->m;
 	Matrix* ret = uargs->ret;
 	size_t start_slice = uargs->start_slice;
@@ -174,12 +206,12 @@ static void* matscalarmult_worker(void* args) {
 
 	return NULL;
 }
-Matrix* matscalarmult_m(float x, Matrix* m) {
+Matrix* matscalarmult_m(mtype x, Matrix* m) {
 	Matrix* ret = malloc(sizeof(Matrix));
 	ret->rows = m->rows;
 	ret->cols = m->cols;
 	ret->owns_cell = true;
-	ret->cell = malloc(sizeof(float) * ret->rows * ret->cols);
+	ret->cell = malloc(sizeof(mtype) * ret->rows * ret->cols);
 
 	size_t elements = ret->rows * ret->cols;
 	size_t threads_no = elements / MINELEMSXTHREAD;
@@ -260,7 +292,7 @@ Matrix* matmult_m(Matrix* m1, Matrix* m2) {
 	ret->rows = m1->rows;
 	ret->cols = m2->cols;
 	ret->owns_cell = true;
-	ret->cell = calloc(ret->rows * ret->cols, sizeof(float));
+	ret->cell = calloc(ret->rows * ret->cols, sizeof(mtype));
 
 	size_t threads_no = ret->rows < MAXTHREADS ? ret->rows : MAXTHREADS;
 	size_t rows_per_thread = ret->rows / threads_no;
@@ -292,7 +324,7 @@ Matrix* matmult_m_tr(Matrix* m1, Matrix* m2) {
 	ret->rows = m1->rows;
 	ret->cols = m2->cols;
 	ret->owns_cell = true;
-	ret->cell = calloc(ret->rows * ret->cols, sizeof(float));
+	ret->cell = calloc(ret->rows * ret->cols, sizeof(mtype));
 
 	size_t threads_no = ret->rows < MAXTHREADS ? ret->rows : MAXTHREADS;
 	size_t rows_per_thread = ret->rows / threads_no;
