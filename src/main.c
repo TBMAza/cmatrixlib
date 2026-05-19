@@ -1,4 +1,5 @@
-#include "cmatrixlib.h"
+#include "cmatrixlib/cmatrixlib.h"
+#include "utils/utils.h"
 #include <stdio.h>
 #include <time.h>
 
@@ -133,7 +134,8 @@ int main(void) {
 	matfree(m2);
 	matfree(hold);*/
 
-	Matrix* m = matrand(5, 4, 0, 1);
+	RUArgs args = {.lower = 0, .upper = 1};
+	Matrix* m = matrand(5, 4, randunif, (void*)&args);
 	matprint(m);
 
 	return 0;

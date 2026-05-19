@@ -1,4 +1,5 @@
 #include "cmatrixlib.h"
+#include "../utils/utils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -20,7 +21,7 @@ Matrix* matinit(size_t rows, size_t cols, mtype* cell, mtype initval) {
 	}
 	return ret;
 }
-Matrix* matrand(size_t rows, size_t cols, mtype l, mtype u) {
+Matrix* matrand(size_t rows, size_t cols, mtype (*randf)(void*), void* randfargs) {
 	srand(time(NULL));
 
 	Matrix* ret = malloc(sizeof(Matrix));
@@ -29,7 +30,7 @@ Matrix* matrand(size_t rows, size_t cols, mtype l, mtype u) {
 	ret->owns_cell = true;
 	ret->cell = malloc(sizeof(mtype) * rows * cols);
 	
-	for(size_t i = 0; i < rows*cols; ++i) ret->cell[i] = l + ((mtype)rand() / (mtype)RAND_MAX) * (u - l);
+	for(size_t i = 0; i < rows*cols; ++i) ret->cell[i] = randf(randfargs);
 	
 	return ret;
 }

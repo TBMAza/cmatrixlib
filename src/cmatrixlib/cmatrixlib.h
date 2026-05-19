@@ -19,7 +19,7 @@ typedef struct {
 
 
 Matrix* matinit(size_t rows, size_t cols, mtype* cell, mtype initval);
-Matrix* matrand(size_t rows, size_t cols, mtype l, mtype u);
+Matrix* matrand(size_t rows, size_t cols, mtype (*randf)(void*), void* randfargs);
 void matprint(Matrix* m);
 void matfree(Matrix* m);
 
