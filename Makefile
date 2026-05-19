@@ -4,21 +4,21 @@ CFLAGS := -std=c99 -Wall -Wextra -Wpedantic -Werror -g
 SANFLAGS := -fsanitize=address,undefined
 LDFLAGS := -lpthread
 
-CMSRCDIR := cmatrix/src
-CMOBJDIR := cmatrix/obj
+CMSRCDIR := matrixlibc/src
+CMOBJDIR := matrixlibc/obj
 
-tests: tests.o cmatrixbuild
-	@$(CC) -o tests tests.o $(CMOBJDIR)/cmatrixlib.o $(CMOBJDIR)/cmatrixutils.o $(LDFLAGS) $(SANFLAGS)
+tests: tests.o matrixlibcbuild
+	@$(CC) -o tests tests.o $(CMOBJDIR)/matrixlibc.o $(CMOBJDIR)/matrixlibcutils.o $(LDFLAGS) $(SANFLAGS)
 
 tests.o: tests.c
 	@$(CC) $(CFLAGS) $(SANFLAGS) -o tests.o -c tests.c
 
-cmatrixbuild:
-	@make -C cmatrix/
+matrixlibcbuild:
+	@make -C matrixlibc/
 
 run:
 	@./tests
 
 clean:
-	@rm tests.o
-	@make -C cmatrix/ clean
+	@rm tests tests.o
+	@make -C matrixlibc/ clean

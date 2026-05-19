@@ -1,7 +1,7 @@
 #ifndef CMATRIXUTILS_H
 #define CMATRIXUTILS_H
 
-#include "cmatrixlib.h"
+#include "matrixlibc.h"
 
 typedef struct {
 	mtype lower;
