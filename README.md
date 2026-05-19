@@ -1,4 +1,4 @@
-# cmatrix
+# matrixlibc
 
 A simple matrix operations library written in C, with both single-threaded and multithreaded implementations.
 
@@ -18,7 +18,7 @@ The multithreaded functions fall back to their single-threaded counterparts auto
 
 ## Configuration
 
-A couple of constants in `cmatrixlib.h` you might want to tweak:
+A couple of constants in `matrixlibc.h` you might want to tweak:
 
 | Constant | Default | Description |
 |---|---|---|
