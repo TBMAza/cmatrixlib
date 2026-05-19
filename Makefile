@@ -4,7 +4,6 @@ CFLAGS := -std=c99 -Wall -Wextra -Wpedantic -Werror -g
 SANFLAGS := -fsanitize=address,undefined
 LDFLAGS := -lpthread
 
-CMSRCDIR := matrixlibc/src
 CMOBJDIR := matrixlibc/obj
 
 tests: tests.o matrixlibcbuild
