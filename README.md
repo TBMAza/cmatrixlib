@@ -1,4 +1,4 @@
-# cmatrixlib
+# cmatrix
 
 A simple matrix operations library written in C, with both single-threaded and multithreaded implementations.
 
@@ -15,17 +15,6 @@ Provides basic matrix operations:
 Functions ending in `_m` are multithreaded (pthreads). `matmult_m_tr` is a cache-friendlier variant that transposes the second operand before multiplying, which tends to be faster for large matrices.
 
 The multithreaded functions fall back to their single-threaded counterparts automatically when the matrix is small enough that threading wouldn't be worth it (configurable via `MINELEMSXTHREAD` in the header).
-
-## Building
-
-```bash
-make        # builds the executable
-make run    # runs it
-make cleano # removes object files
-make cleane # removes the executable
-```
-
-Requires GCC and pthreads. The Makefile currently builds with `-fsanitize=address -g` for development purposes.
 
 ## Configuration
 

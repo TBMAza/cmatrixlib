@@ -1,5 +1,5 @@
-#include "cmatrixlib.h"
-#include "../utils/utils.h"
+#include "../include/cmatrixlib.h"
+#include "../include/cmatrixutils.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>

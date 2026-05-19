@@ -1,4 +1,4 @@
-#include "utils.h"
+#include "../include/cmatrixutils.h"
 #include <math.h>
 #include <stdlib.h>
 
